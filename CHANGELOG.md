@@ -10,3 +10,4 @@ Notable changes are recorded here using Keep a Changelog categories.
 - Manual `/dream` consolidation that searches original evidence, including uncited contradictions, before revising notes.
 - A repeatable three-task benchmark comparing five memory strategies, with opt-in live runs, retained failures, and separate dream/solve cost and timing reports.
 - Prototype setup, privacy boundaries, architecture diagrams, and versioned benchmark findings.
+- An opt-in frozen-memory experiment comparing retrieval prompts on identical saved memories without rerunning consolidation.

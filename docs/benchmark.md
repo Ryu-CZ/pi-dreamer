@@ -83,7 +83,7 @@ To iterate: retain the baseline report, change one component, rerun the same tas
 
 ## Verified run
 
-See [benchmark verification](benchmark-verification.md) for the first repeated live results and [initial baseline](baseline-v1.md) for the subsequent 30-trial run covering the other two tasks. The summary task exposed a file-versus-chat delivery ambiguity; its unchanged scores are retained as diagnostic evidence, not a clean memory-quality comparison. [Impact-summary baseline v2](baseline-v2.md) explicitly requires saving a file and reports a separate 15-trial sweep with unchanged graders. It resolves delivery ambiguity while exposing omitted file-location guidance in notes.
+See [benchmark verification](benchmark-verification.md) for the first repeated live results and [initial baseline](baseline-v1.md) for the subsequent 30-trial run covering the other two tasks. The summary task exposed a file-versus-chat delivery ambiguity; its unchanged scores are retained as diagnostic evidence, not a clean memory-quality comparison. [Impact-summary baseline v2](baseline-v2.md) explicitly requires saving a file and reports a separate 15-trial sweep with unchanged graders. It resolves delivery ambiguity while exposing omitted file-location guidance in notes. The subsequent [frozen-memory retrieval experiment](frozen-retrieval-experiment.md) isolates a source-verification prompt change using identical paired memories; it showed no benefit in nine live trials, so the instruction was not adopted in production.
 
 ## Limits
 
