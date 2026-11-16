@@ -4,6 +4,10 @@ Notable changes are recorded here using Keep a Changelog categories.
 
 ## [Unreleased]
 
+### Fixed
+
+- Reject extra, duplicate, ambiguous, and malformed rows in impact-table benchmark results.
+
 ### Added
 
 - Explicit Pi branch-text capture and project-local, source-linked notes with versioned corrections and dependent-note deletion.

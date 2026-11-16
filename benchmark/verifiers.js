@@ -92,17 +92,29 @@ function verifyImpactTable(_fixture, workspace) {
   const cells = lines[headerIndex].split('|').map(cell => norm(cell)).filter(Boolean);
   if (cells.join('|') !== 'change|impact|next') failures.push(`table header cells are ${cells.join(', ')}, expected Change, Impact, Next`);
   const rows = lines.slice(headerIndex + 1).filter(line => /^\s*\|/.test(line) && !/^\s*\|\s*-{2,}/.test(line));
-  if (rows.length < 3) failures.push(`expected at least 3 rows, found ${rows.length}`);
+  if (rows.length !== 3) failures.push(`expected exactly 3 rows, found ${rows.length}`);
   const rowCells = rows.map(row => row.split('|').slice(1, -1).map(cell => norm(cell)));
-  for (const rule of IMPACT_RULES) {
-    const index = rows.findIndex(row => norm(row).includes(rule.needle));
-    if (index === -1) { failures.push(`no row mentions the ${rule.needle} work`); continue; }
+  rowCells.forEach((cells, index) => {
+    if (cells.length !== 3) failures.push(`row ${index + 1} has ${cells.length} cells, expected 3`);
+    const matches = IMPACT_RULES.filter(rule => cells[0]?.includes(rule.needle));
+    if (matches.length !== 1) failures.push(`row ${index + 1} Change must identify exactly one expected item`);
+  });
+  const positions = IMPACT_RULES.map(rule => {
+    const matches = rowCells.flatMap(([change], index) => change?.includes(rule.needle) ? [index] : []);
+    if (matches.length !== 1) {
+      failures.push(`expected exactly one Change cell for ${rule.needle}, found ${matches.length}`);
+      return -1;
+    }
+    return matches[0];
+  });
+  for (const [ruleIndex, rule] of IMPACT_RULES.entries()) {
+    const index = positions[ruleIndex];
+    if (index === -1) continue;
     const [change, impact, next = ''] = rowCells[index];
     if (!impact || !rule.impact.test(impact)) failures.push(`${rule.needle} row has a missing or wrong Impact cell: ${impact ?? '(empty)'}`);
     if (!next || !rule.next.test(next)) failures.push(`${rule.needle} row has a missing or wrong Next follow-up: ${next ?? '(empty)'}`);
     void change;
   }
-  const positions = IMPACT_RULES.map(rule => rows.findIndex(row => norm(row).includes(rule.needle)));
   const [cachePos, thresholdPos, docsPos] = positions;
   if (positions.every(index => index !== -1) && !(docsPos < cachePos && cachePos < thresholdPos)) {
     failures.push(`rows are not in landing-date order (docs, cache, threshold); found positions docs=${docsPos}, cache=${cachePos}, threshold=${thresholdPos}`);

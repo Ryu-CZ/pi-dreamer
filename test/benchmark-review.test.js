@@ -76,6 +76,37 @@ test('summary task explicitly requires a file without disclosing historical conv
   }
 });
 
+test('impact grader requires one three-cell row per item identified only by Change', t => {
+  const workspace = scratch(t);
+  mkdirSync(join(workspace, 'docs'), { recursive: true });
+  const fixture = FIXTURES.find(f => f.id === 'impact-table');
+  const validRows = [
+    '| docs tweak | low | nothing pending |',
+    '| sample cache fix | high | full rerun |',
+    '| threshold change | medium | pager tuning |',
+  ];
+  const grade = rows => {
+    writeFileSync(join(workspace, 'docs/summary-region.md'), [
+      '# Impact summary — region', '| Change | Impact | Next |', '| --- | --- | --- |', ...rows,
+    ].join('\n'));
+    return verifyFixture(fixture, workspace);
+  };
+  assert.equal(grade(validRows).pass, true);
+  const invalidRows = {
+    'invented extra row': [...validRows, '| invented work | low | none |'],
+    'duplicate extra row': [...validRows, validRows[1]],
+    'duplicate replaces item': [validRows[0], validRows[1], validRows[1]],
+    'identity in Impact': [validRows[0], '| unrelated work | high cache | full rerun |', validRows[2]],
+    'identity in Next': [validRows[0], '| unrelated work | high | cache full rerun |', validRows[2]],
+    'ambiguous Change': [validRows[0], '| cache threshold fix | high | full rerun |', validRows[2]],
+    'extra cell': [validRows[0], '| sample cache fix | high | full rerun | extra |', validRows[2]],
+    'missing cell': [validRows[0], '| sample cache fix | high |', validRows[2]],
+  };
+  for (const [label, rows] of Object.entries(invalidRows)) {
+    assert.equal(grade(rows).pass, false, label);
+  }
+});
+
 test('environment grader permits a newly computed value equal to an old snapshot', t => {
   const workspace = scratch(t);
   const original = FIXTURES.find(f => f.id === 'local-endpoints');
