@@ -1,6 +1,6 @@
 # Held-out deployment evaluation — proposed contract
 
-Status: **proposal for supervisor review; not implemented or authorized for live execution**. This specifies a small representation experiment, not a forward-capture policy or production feature. It extends the [measurement contract](benchmark-contract.md), following the forward/backward distinction in [research](research.md).
+Status: **accepted evaluation contract; runner not implemented and live execution not authorized**. The isolated historical packet/future task definitions (`benchmark/deployment-fixture.js`) and pure artifact/evidence graders (`benchmark/deployment-verifier.js`) have offline tests in `test/deployment.test.js`; they are not registered with the benchmark CLI. This specifies a small representation experiment, not a forward-capture policy or production feature. It extends the [measurement contract](benchmark-contract.md), following the forward/backward distinction in [research](research.md).
 
 ## Question and boundaries
 
@@ -55,16 +55,16 @@ Predeclared supporting source sets: an array passes when all labels belong to it
 
 | Field | Allowed labels | Sufficient alternative subsets |
 |---|---|---|
-| api-blue replicas | R2, R5 | {R2} or {R5} |
+| api-blue replicas | R2, R5, R7 | {R2} or {R5} or {R7} |
 | worker-queue replicas | R2, R5, R7 | {R7} |
 | metricsEndpoint for both | R3, R6 | {R6} |
 | imagePolicy for both | R2, R5 | {R5} |
 
-R5 independently reaffirms default replicas=2, so it is sufficient alone. R6 includes both the current base and construction rule; R3 alone is stale. Correct endpoint arithmetic is checked in the artifact, not inferred from citations. R2/R5 may accompany R7 as overridden default context for worker replicas.
+R5 independently reaffirms default replicas=2 and R7 explicitly says other services keep 2, so either is sufficient alone. R6 includes both the current base and construction rule; R3 alone is stale. Correct endpoint arithmetic is checked in the artifact, not inferred from citations. R2/R5 may accompany R7 as overridden default context for worker replicas.
 
 Every citation must belong to that field's allowed set; duplicates, unknown labels, note IDs, unsupported R4, and unrelated R8 fail. Existence alone does not establish support. Citations to superseded evidence alone fail. Graders validate this finite support map, not general natural-language entailment. Labels are normalized through the retained logical-ID/store-ID mapping, never by fuzzy text similarity.
 
-**Separate diagnostic request:** write `deploy/registry.json` containing exactly registry (string) and sourceIds (nonempty array of unique supporting logical source labels), with no unrelated references. The request names output path and schema, but withholds registry value and supporting source IDs. The evaluator expects registry=`registry.rook.invalid`; allowed labels are R3 and R6, with sufficient alternative subsets {R3} or {R6}, so either alone or both pass. Grade the value and its source support separately. Run in a fresh solve workspace, not after the main task. Never pool its success with the main task.
+**Separate diagnostic request:** write `deploy/registry.json` containing exactly registry (string) and sourceIds (nonempty array of unique supporting logical source labels), with no unrelated references. The request names output path and schema, but withholds registry value and supporting source IDs. The evaluator expects registry=`registry.rook.invalid`; allowed labels are R3 and R6, with sufficient alternative subsets {R3} or {R6}, so either alone or both pass. Grade the value and its source support separately: artifact covers the top-level keys and registry value/type; sourceIds type, nonemptiness, uniqueness and support belong to evidence. Thus artifact=true with malformed sourceIds is not full-schema success; joint remains false. Run in a fresh solve workspace, not after the main task. Never pool its success with the main task.
 
 ## Arms and fair exposure
 
@@ -74,13 +74,15 @@ Every citation must belong to that field's allowed set; duplicates, unknown labe
 
 Same explicitly selected provider/model/thinking, solver system prompt, tool permissions, source search, task text and scaffold across arms. No preloaded index. Keep existing solve guidance; do not add the rejected source-verification treatment. Dream phase receives only the topic and memory tools. It cannot access the task scaffold, evaluator files or future inputs through configured tools; ordinary workspaces remain cooperative, not an adversarial sandbox.
 
+Source integrity is an experimental validity check, not a production restriction or security sandbox: any captured-source addition, deletion, content or provenance change invalidates the affected exposure, with no repair or retry. Compare source manifests, not whole database bytes: legitimate note creation/revision is allowed. Dream source mutation invalidates both downstream exposures and skips their solves; solve source mutation invalidates only that isolated solve. Retain distinct integrity-failure reasons and count every requested exposure in its denominator. Raw snapshot hashes separately establish clone identity. Runtime auditing remains unimplemented until runner approval.
+
 Per repeat, clone D's completed memory snapshot separately into main and diagnostic solves; neither solve sees another solve's writes or transcripts. N and S also use isolated fresh copies for each solve. Preserve source byte hashes across every exposure, note versions/history and before/after memory hashes. No new runner/backend: adapt existing sweep/executor only after design approval; any required lifecycle change returns to supervisor review.
 
 ## Offline acceptance (implementation gate)
 
 All checks must pass; zero model calls:
 
-- Positive artifacts for both tasks, including api-blue replicas supported by R2 alone, R5 alone or both, registry supported by R3 alone, R6 alone or both, other allowed supporting sets and JSON key-order/whitespace variants, pass.
+- Positive artifacts for both tasks, including api-blue replicas supported by R2 alone, R5 alone or both, api-blue replicas supported by R7 alone or mixed with R2/R5, registry supported by R3 alone, R6 alone or both, other allowed supporting sets and JSON key-order/whitespace variants, pass.
 - Negative artifacts fail for stale base, ignored offset, stale tag policy, default replicas applied to worker, guessed replicas=5, missing/extra services or keys, wrong types, invalid/missing JSON.
 - Evidence negatives fail for absent required sources, existent-but-irrelevant sources, stale-only support, R4, R8, unknown/duplicate labels, wrong-field citations, and missing sidecars. A correct artifact with bad evidence reports artifact=true, evidence=false, joint=false.
 - Arm exposures, stable provenance mapping, fresh stores/sessions, one dream per repeat, isolated downstream copies, historical-only dream inputs and retained snapshot hashes are checked deterministically.
