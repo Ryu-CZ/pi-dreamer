@@ -10,7 +10,7 @@ Notable changes are recorded here using Keep a Changelog categories.
 
 ### Added
 
-- Offline deployment fixtures, artifact/provenance graders, and shared-consolidation orchestration with source-integrity checks; live benchmark CLI integration is not available.
+- Offline deployment fixtures, artifact/provenance graders, and shared-consolidation orchestration with source-integrity checks; `node benchmark/deployment-offline.js --out <fresh-directory>` retains a scripted harness report without model calls. Live benchmark CLI integration is not available.
 - Explicit Pi branch-text capture and project-local, source-linked notes with versioned corrections and dependent-note deletion.
 - Manual `/dream` consolidation that searches original evidence, including uncited contradictions, before revising notes.
 - A repeatable three-task benchmark comparing five memory strategies, with opt-in live runs, retained failures, and separate dream/solve cost and timing reports.

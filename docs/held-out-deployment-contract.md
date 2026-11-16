@@ -78,6 +78,14 @@ Source integrity is an experimental validity check, not a production restriction
 
 Per repeat, clone D's completed memory snapshot separately into main and diagnostic solves; neither solve sees another solve's writes or transcripts. N and S also use isolated fresh copies for each solve. Preserve source byte hashes across every exposure, note versions/history and before/after memory hashes. The separate shared-dream lifecycle reuses the existing sweep's argv/system-prompt builders and accepts the existing executor interface; it adds no backend or automatic execution. Future lifecycle changes return to supervisor review.
 
+## Reproduce the offline harness check
+
+```sh
+node benchmark/deployment-offline.js --out .local/benchmarks/deployment-offline-001
+```
+
+Use a fresh output directory; existing reports are never overwritten. The command accepts only `--out` and `--help`, uses no model backend, and retains `report.json` plus isolated workspaces. It makes **21 scripted executor invocations, zero model calls**: dreams are no-ops and solves write known-answer artifacts. The resulting **18/18 successes validate orchestration and graders, not memory utility or consolidation quality**. Usage, cost and model latency remain unknown (`null`), not invented measurements. Run `node --test test/deployment*.test.js` for positive/negative grader and fault-injection coverage.
+
 ## Offline acceptance (implementation gate)
 
 All checks must pass; zero model calls:
