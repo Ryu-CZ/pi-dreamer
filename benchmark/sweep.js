@@ -20,12 +20,12 @@ export function implementationHash() {
   return hashString(digest.join('|'));
 }
 
-const SYSTEM_PROMPTS = {
+export const SYSTEM_PROMPTS = {
   dream: 'Consolidate this project\'s memory using only the dreamer memory tools. Ground every revision in specific evidence you inspected. Keep notes small and cite sources.',
   solve: 'You are working inside a small project workspace on one task. Its local memory extension may be present; use available tools as a careful engineer would.',
 };
 
-function phaseArgv(base, phase) {
+export function phaseArgv(base, phase) {
   const argv = [
     '--no-extensions', '--no-mcp', '--no-skills', '--no-prompt-templates',
     '--no-context-files', '--no-themes',
