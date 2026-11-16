@@ -1,7 +1,7 @@
 // Actual Pi extension loading + agent tool loop, with a scripted model and denied network.
 // This verifies integration, NOT autonomous model reasoning quality.
 import assert from 'node:assert/strict';
-import { mkdtempSync, mkdirSync, rmSync, existsSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, rmSync, existsSync, writeFileSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { pathToFileURL, fileURLToPath } from 'node:url';
@@ -18,6 +18,16 @@ const root = mkdtempSync(join(tmpdir(), 'dreamer-pi-smoke-'));
 const cwd = join(root, 'project');
 const agentDir = join(root, 'agent');
 mkdirSync(cwd); mkdirSync(agentDir);
+// Disposable hostile user defaults must lose to trusted phase-local settings.
+const globalSettings = JSON.stringify({ compaction: { enabled: true }, retry: { enabled: true, provider: { maxRetries: 7 } } });
+writeFileSync(join(agentDir, 'settings.json'), globalSettings);
+mkdirSync(join(cwd, '.pi'));
+writeFileSync(join(cwd, '.pi/settings.json'), JSON.stringify({
+  compaction: { enabled: false }, retry: { enabled: false, provider: { maxRetries: 0 } },
+}));
+const untrusted = SettingsManager.create(cwd, agentDir, { projectTrusted: false });
+assert.equal(untrusted.getRetryEnabled(), true, 'declining project trust would ignore local overrides');
+assert.equal(untrusted.getCompactionEnabled(), true);
 const extension = fileURLToPath(new URL('../src/index.ts', import.meta.url));
 const model = {
   id: 'dreamer-scripted', name: 'Dreamer scripted fixture', provider: 'openai', api: 'openai-completions',
@@ -40,7 +50,11 @@ const lastResult = context => {
 const sessions = [];
 const errors = [];
 async function makeSession(manager) {
-  const settingsManager = SettingsManager.inMemory({ compaction: { enabled: false }, retry: { enabled: false } });
+  const settingsManager = SettingsManager.create(cwd, agentDir, { projectTrusted: true });
+  assert.equal(settingsManager.getCompactionEnabled(), false);
+  assert.equal(settingsManager.getRetryEnabled(), false);
+  assert.equal(settingsManager.getProviderRetrySettings().maxRetries, 0);
+  assert.deepEqual(settingsManager.drainErrors(), []);
   const resourceLoader = new DefaultResourceLoader({ cwd, agentDir, settingsManager,
     noExtensions: true, noSkills: true, noPromptTemplates: true, noThemes: true, noContextFiles: true,
     additionalExtensionPaths: [extension], systemPrompt: 'Scripted extension integration test.' });
@@ -141,7 +155,8 @@ try {
   } finally { afterDeletion.close(); }
   assert.deepEqual(errors, []);
   assert.equal(networkAttempts, 0);
-  console.log('PASS: actual Pi extension load, branch selection/rejection, text-only capture, forward note, /dream evidence discovery+revision, new-session recall, history, stale/missing-source rejection, confirmed cascading deletion; zero fetch attempts.');
+  assert.equal(readFileSync(join(agentDir, 'settings.json'), 'utf8'), globalSettings, 'user settings remain unchanged');
+  console.log('PASS: trusted local settings override hostile user retry/compaction defaults; actual Pi extension load, branch selection/rejection, text-only capture, forward note, /dream evidence discovery+revision, new-session recall, history, stale/missing-source rejection, confirmed cascading deletion; zero fetch attempts.');
 } finally {
   for (const session of sessions) session.dispose();
   rmSync(root, { recursive: true, force: true });
