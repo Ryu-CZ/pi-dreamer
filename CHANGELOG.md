@@ -10,6 +10,7 @@ Notable changes are recorded here using Keep a Changelog categories.
 
 ### Added
 
+- MIT license.
 - Offline deployment fixtures, artifact/provenance graders, and shared-consolidation orchestration with source-integrity checks; `node benchmark/deployment-offline.js --out <fresh-directory>` retains a scripted harness report without model calls. Live benchmark CLI integration is not available.
 - Explicit Pi branch-text capture and project-local, source-linked notes with versioned corrections and dependent-note deletion.
 - Manual `/dream` consolidation that searches original evidence, including uncited contradictions, before revising notes.
