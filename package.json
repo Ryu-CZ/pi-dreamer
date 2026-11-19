@@ -1,8 +1,26 @@
 {
   "name": "pi-dreamer",
   "version": "0.1.0",
-  "private": true,
   "license": "MIT",
+  "keywords": [
+    "pi-package",
+    "pi-extension",
+    "memory"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/Ryu-CZ/pi-dreamer.git"
+  },
+  "files": [
+    "src/",
+    "test/",
+    "benchmark/",
+    "scripts/",
+    "docs/",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
   "type": "module",
   "description": "Evidence-linked forward capture and backward consolidation for Pi",
   "engines": {

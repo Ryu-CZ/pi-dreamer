@@ -8,10 +8,16 @@ Inspired by Anthropic’s [Components of agent memory](https://www.anthropic.com
 
 Requires Node >=22.19 and Pi (tested with Pi 1.5.0 on Linux, Node 26.10). SQLite is built into Node; no database server or dependency installation is needed for the core tests. Pi supplies its extension API and TypeBox.
 
-From the project whose memory you want to use:
+Install the package for your user:
 
 ```sh
-pi -e /home/tom/git/pi-dreamer/src/index.ts
+pi install npm:pi-dreamer
+```
+
+To try it for one invocation without adding it to package settings:
+
+```sh
+pi -e npm:pi-dreamer
 ```
 
 This loads the extension for that invocation without changing global settings. Add `.pi/dreamer/` to **that project's** `.gitignore` before capturing private material. Memory lives at `realpath(cwd)/.pi/dreamer/memory.sqlite`: subdirectories are separate scopes, not automatically resolved to a Git root.
